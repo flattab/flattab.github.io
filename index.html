@@ -1,0 +1,1131 @@
+<html>
+<head>
+
+	<title>FlatTab</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+	<link rel="shortcut icon" type="image/png" href="favicon.png"/>
+
+	
+	<style type="text/css">
+		/* Colors */
+		.red   {color: #e74c3c}
+		.green {color: #2ecc71}
+		.blue  {color: #3498db}
+		.yellow{color: #f1c40f}
+		.orange{color: #e67e22}
+		.purple{color: #9b59b6}
+		.trans {color: transparent}
+		
+		body{
+			font-family: 'Montserrat', sans-serif;
+			font-size: 14px;
+			background: #333;
+			color: #ecf0f1;
+		}
+		
+		#todo, #calendar{
+			float: left;
+			margin-right: 15px;
+		}
+		
+		#todo div, #calendar div{
+			background-color: #1f1f1f;
+			border-radius: 3px;
+			width: 400px;
+			margin-top: 15px;
+			position: relative;
+		}
+		
+		#catnew, .addtask{
+			color:#333;
+		}
+		
+		.category{
+			font-size: 22px;
+			width:100%;
+			padding: 5px;
+			display: inline-block;
+			margin-left: 43px;
+		}
+		
+		.category i{
+			font-size: 26px;
+			position: absolute;
+			top:0;
+			right: 350px;
+			margin: 5px 10px 0 5px;
+		}
+		
+		.category i:nth-of-type(2), .task i:nth-of-type(2), .devent i:nth-of-type(2){
+			position: absolute;
+			right:0;
+			top:2px;
+			font-size: 18px;
+			color: #1f1f1f;
+		}
+
+		.task i:nth-of-type(3){
+			position: absolute;
+			left:-18px;
+			top:4px;
+			font-size:12px;
+			color: #1f1f1f;
+		}
+		
+		.category:hover i:nth-of-type(2),  .task:hover i:nth-of-type(2), .task:hover i:nth-of-type(3), #sheet:hover #header i, .devent:hover i:nth-of-type(2){
+			color:#333;
+		}
+		
+		.category i:nth-of-type(2):hover,  .task i:nth-of-type(2):hover, .addtask:hover, #catnew:hover, .task i:nth-of-type(3):hover, #sheet #header i:hover, .devent i:nth-of-type(2):hover{
+			color:#ecf0f1;
+		}
+				
+		div:hover .task:nth-last-of-type(2){
+			margin-bottom: 0px;
+		}
+		
+		.task{
+			display: inline-block;
+			width: calc(100% - 4px);
+			padding: 2px;
+			position: relative;
+		}
+		
+		.trans+span{
+			font-size: 12px;
+			opacity: .65;
+			position: relative;
+			left: 20px;
+		}
+		
+		.task i{
+			margin-left:25px;
+			margin-right: 10px;
+		}
+		
+		.task:hover{
+			background: rgba(0,0,0,.2);
+		}
+		
+		.addtask{
+			display:none;
+		}
+		
+		div:hover .addtask{
+			display:inline-block;
+		}
+		
+		.category[minimized="yes"]:after{
+			display: block;
+			content: attr(tasks);
+			background:#111;
+			width: 16px;
+			height:14px;
+			padding: 2px 0 0 0px;
+			border-radius: 50%;
+			border: #1f1f1f solid 2px;
+			font-size:10px;
+			position: absolute;
+			top:15px;
+			right:352px;
+			text-align: center;
+			pointer-events: none;
+		}
+		
+		.category[minimized="yes"] ~ .task{
+			display: none;
+		}
+		
+		input[type="text"], input[type="text"]:focus{
+			background:transparent;
+			border: none;
+			font-family: 'Montserrat', sans-serif;
+			font-size: 14px;
+			color: #ecf0f1;
+			outline:none;
+			width: 320px;
+			padding:0;
+		}
+		
+		#NewCategoryName input[type="text"], #NewCategoryNameinput[type="text"]:focus{
+			font-size: 22px;
+		}
+		
+		form{
+			width: 400px;
+			text-align: center;
+		}
+		
+		input[type=radio] {
+			display: none;
+		}
+		
+		#formcolors label:before, #formicons label{
+			content:  "";
+			display: inline-table;
+			width:  30px;
+			height: 30px;
+			border-radius:50%;
+			margin: 0 7px;
+			cursor: pointer;
+		}
+		
+		#formcolors input[type=radio]:checked + label:before{
+			border: 2px solid #1f1f1f;
+			box-shadow: 0 0 0 2px #eef2f3;
+		}
+		
+		#formicons input[type="radio"] + label{
+			opacity: .2;
+			font-size: 24px;
+			text-align:center;
+		}
+
+		#formicons input[type="radio"]:checked + label{
+			opacity: 1;
+		}
+
+		#formcolors label:nth-of-type(1):before{background: #f1c40f}
+		#formcolors label:nth-of-type(2):before{background: #e67e22}
+		#formcolors label:nth-of-type(3):before{background: #e74c3c}
+		#formcolors label:nth-of-type(4):before{background: #9b59b6}
+		#formcolors label:nth-of-type(5):before{background: #3498db}
+		#formcolors label:nth-of-type(6):before{background: #2ecc71}
+		
+		#okbtn, #cancelbtn{
+			width:130px;
+			height: 30px;
+			border-radius:3px;
+			background:#ecf0f1;
+			color: #1f1f1f;
+			display: inline-table;
+			font-size: 22px;
+			font-weight: bold;
+			text-align: center;
+			line-height: 35px;
+			margin: 0 0 15px 42px;
+			border: 2px solid #ecf0f1;
+			opacity: .2;
+			cursor: pointer;
+		}
+
+		#okbtn:hover, #cancelbtn:hover{
+			opacity:1;
+		}
+		
+		#cancelbtn{
+			background:transparent;
+			color: #ecf0f1;
+		}
+		
+		/*Calendar*/
+		
+		#header{
+			display:inline-block;
+			width:400px;
+			text-align: center;
+			font-size: 24px;
+			padding: 15px 0 10px;
+			position: relative;
+		}
+		
+		#header i{
+			font-size:16px;
+			position: absolute;
+			top: 23px;
+			color: transparent;
+		}
+		
+		#header i:nth-of-type(1){left:  25px}
+		#header i:nth-of-type(2){left:  60px}
+		#header i:nth-of-type(3){right: 60px}
+		#header i:nth-of-type(4){right: 25px}
+
+		#header label{
+			position: relative;
+			font-size: 14px;
+			top: -20px;
+			right: 30px;
+			opacity:0;
+		}
+		
+		#sheet:hover #header label{
+			opacity: .5;
+		}
+		
+		#week span{
+			text-align:center;
+			width: 56.5px;
+			display: inline-block;
+			font-size: 12px;
+			opacity: .8;
+			line-height: 30px;
+		}
+		
+		#sheet {
+			padding-bottom: 5px;
+		}
+		
+		#sheet span[date]{
+			width:50px;
+			height:50px;
+			border-radius: 50%;
+			display: inline-table;
+			margin: 3px 0 0 6px;
+			text-align:center;
+			line-height: 50px;
+			position:relative;
+		}
+		
+		#sheet span[date].event{
+			background: #111;
+		}
+		
+		#sheet span[date].event i{
+			font-size:36px;
+			position: relative;
+			top: 8px;
+		}
+
+		#sheet span[date].event.today i{
+			top: 6px;
+		}
+
+		#sheet span[date].event:after{
+			width:  24px;
+			height: 24px;
+			display: inline-table;
+			border-radius: 50%;
+			border: 2px solid #1f1f1f;
+			background: #111;
+			content: attr(date);
+			font-size: 12px;
+			position: absolute;
+			right:  -5px;
+			bottom: -5px;
+			line-height: 25px;
+		}
+		
+		#sheet span[date].today{
+			border: 2px solid #ecf0f1;
+			width:46px;
+			height:46px;
+			line-height: 46px;
+		}
+		
+		#sheet .off{
+			opacity: .25;
+		}
+		
+		#CalCat{
+			padding-top: 15px;
+		}
+		
+		#display form ~ i, #display form i{
+			display: inline-table;
+			width:  30px;
+			height: 30px;
+			border-radius:50%;
+			margin: 0 7px;
+			cursor: pointer;
+			font-size: 24px;
+			text-align:center;
+			line-height: 30px;
+		}
+		
+		#display input[type=radio]:checked + label i{
+			opacity: 1;
+		}
+		
+		#display form ~ i, #display form i{
+			opacity: .2;
+		}
+
+		#display form ~ i:hover{
+			opacity: 1;
+		}
+		
+		#display .devent, #sheet .devent{
+			position: relative;
+			display: block;
+			padding: 10px 0 0 10px;
+		}
+		
+		#display .devent i, #sheet .devent i{
+			width:30px;
+			height:30px;
+			display: inline-block;
+			font-size: 24px;
+		}
+		
+		#display .devent i:nth-of-type(2), #sheet .devent i:nth-of-type(2){
+			font-size: 18px;
+			top: 10px;
+		}
+		
+		#display .minicalendar, #sheet .minicalendar{
+			position: absolute;
+			top:  8px;
+			left: 44px;
+			font-size: 8px;
+			opacity: .4;
+		}
+		
+		#display .comment, #sheet .comment{
+			margin: 0 0 15px 35px;
+			font-size: 12px;
+			display:block;
+			opacity: .65;
+		}
+		
+		#display textarea::-webkit-input-placeholder, #display input[type="text"]::-webkit-input-placeholder{
+			color: rgba(255,255,255,.2);
+		}
+		
+		#display input[type=date], #display textarea, #display textarea:focus{
+			font-family: Montserrat;
+			color:#ecf0f1;
+			background: transparent;
+			border: none;
+			outline: none;
+		}
+		
+		#display input[type=date]{
+			width: 140px;
+		}
+		
+		#display input[type=text][placeholder=Event]{
+			margin-left: 27px;
+			width: 230px;
+		}
+		
+		#display textarea{
+			width: 350px;
+			max-width: 350px;
+			margin-left: 25px;
+		}
+		
+		.popup{
+			float: left;
+			position: relative;
+			top: 10px;
+			width: 400px;
+			background: rgba(0,0,0,.2);
+			display: none;
+		}
+		
+		.popup:before {
+			display: none;
+			background: transparent;
+			width: 400px;
+			height: 15px;
+			position: relative;
+			top: -15px;
+		}
+		
+		.popup[event]:before{
+			content:"";
+		}
+		
+		span[date]:hover+.popup, .popup:hover, span[date]:hover+.popup:before, .popup:hover:before {
+			display: block;
+		}
+		
+	</style>
+
+</head>
+
+<body>
+
+<span id="calendar">
+</span>
+
+<span id="todo">
+</span>
+
+<script>
+      var CLIENT_ID = '902405926255-9l2qshjqmhbap86vl78ui7cjbq9kgdg1.apps.googleusercontent.com';
+
+      var SCOPES = ["https://www.googleapis.com/auth/calendar"];
+
+      /**
+       * Check if current user has authorized this application.
+       */
+      function checkAuth() {
+        gapi.auth.authorize(
+          {
+            'client_id': CLIENT_ID,
+            'scope': SCOPES.join(' '),
+            'immediate': true
+          }, handleAuthResult);
+      }
+
+      /**
+       * Handle response from authorization server.
+       *
+       * @param {Object} authResult Authorization result.
+       */
+      function handleAuthResult(authResult) {
+        if (authResult && !authResult.error) {
+			loadCalendarApi();
+        } else {
+			
+			document.getElementById('calendar').innerHTML = '<span>Authorize access to Google Calendar API</span></br><button id="authorize-button" onclick="handleAuthClick(event)">Authorize</button>'
+        }
+      }
+
+      /**
+       * Initiate auth flow in response to user clicking authorize button.
+       *
+       * @param {Event} event Button click event.
+       */
+      function handleAuthClick(event) {
+        gapi.auth.authorize(
+          {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
+          handleAuthResult);
+        return false;
+      }
+
+      /**
+       * Load Google Calendar client library. List upcoming events
+       * once client library is loaded.
+       */
+      function loadCalendarApi() {
+        gapi.client.load('calendar', 'v3', listUpcomingEvents);
+      }
+
+      /**
+       * Print the summary and start datetime/date of the next ten events in
+       * the authorized user's calendar. If no events are found an
+       * appropriate message is printed.
+       */
+      function listUpcomingEvents() {
+        var request = gapi.client.calendar.events.list({
+          'calendarId': 'primary',
+          'showDeleted': false,
+          'singleEvents': true,
+          'orderBy': 'startTime'
+        });
+
+        request.execute(function(resp) {
+          var events = resp.items;
+		  
+		  Events=[]
+
+          if (events.length > 0) {
+            for (i = 0; i < events.length; i++) {
+              var event = events[i];
+			  if (event.start.date) when = event.start.date
+			  else when = event.start.dateTime.slice(0,10)
+			  when = when.split("-")[0]+"-"+("0"+(Number(when.split("-")[1])-1)).slice(-2)+"-"+when.split("-")[2]
+			  Events[i] = [EventIcons(event.colorId),when,event.summary,((event.description)?event.description:''),event.id]
+            }
+          }
+		  
+		  RenderCalendar()
+		  
+        });
+      }
+
+function EventIcons(input){
+	if (!isNaN(input)||!input) {
+		switch(Number(input)){
+			case 5:  return 1
+			case 6:  return 2
+			case 11: return 3
+			case 3:  return 4
+			case 9:  return 5
+			case 10: return 6
+			default: return 0
+		}
+	} else {
+		switch(input){
+			case 'c1': return 5
+			case 'c2': return 6
+			case 'c3': return 11
+			case 'c4': return 3
+			case 'c5': return 9
+			case 'c6': return 10
+			default:   return 8
+		}
+	}
+}	  
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id.slice(-3));
+//	alert(ev.target.id.slice(-3))
+}
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+function drop(ev) {
+    ev.preventDefault();
+	if(!isNaN(ev.target.id.slice(-3))) SwapCategories(Number(ev.dataTransfer.getData("text")),Number(ev.target.id.slice(-3)))
+//	alert(ev.target.id.slice(-3))
+}
+
+function RenderCalendar(){
+	document.getElementById("calendar").innerHTML = ""
+	
+	Months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+	
+	//#############################
+	// SET UP CATEGORIES
+	//#############################
+	
+	//Calendar Categories:
+	//["White/Other","Yellow","Orange","Red","Purple","Blue","Green"]
+	
+	CalCat = []
+	temp = localStorage.CalCat
+	if (!temp) {
+		CalCat=["asterisk","star","briefcase","gift","plane","gamepad","leaf"]
+	} else {
+		CalCat=temp.split("|")
+	}	
+
+	//#############################
+	// SET UP EVENTS
+	//#############################
+	
+	//Events:
+	//[0]: Color
+	//[1]: Date
+	//[2]: Name
+	//[3]: Comment
+	
+//	Events = [[1,"2016-02-06","Test","22h"],[0,"2016 0 31","Test","10h - Bring Beer"],[1,"2016 2 19","Test","???"],[2,"2016 1 15","Test","10h - Bring Beer"],[3,"2016 1 15","Birthday",""],[Math.floor(Math.random()*7),"2016 1 10","Birthday",""],[5,"2016 1 25","Smash Bros",""],[6,"2016 2 8","GreenPeace",""],[0,"2016 1 5","ABC","???"]]
+	
+	//#############################
+	// WRITE CALENDAR
+	//#############################
+
+	//Check Displaying Month
+	if (localStorage.Month) var tempDate = new Date(localStorage.Month.split(" ")[0],localStorage.Month.split(" ")[1],01)
+	else {
+		var tempDate = new Date()
+		tempDate.setDate(1)
+	}
+	
+	Month = tempDate.getMonth()
+	Year = tempDate.getFullYear()
+	
+	//Create Calendar Sheet& Display
+	document.getElementById("calendar").innerHTML += "<div id='sheet'></div><div id='display'></div>"
+	
+	//Write Header
+	document.getElementById("sheet").innerHTML += "<span id='header'><i onclick='ChangeMonth(0)' class='fa fa-refresh'></i><i class='fa fa-cog' onclick='CalendarSetting()'></i>"+Months[Month]+"<label>"+Year+"</label><i onclick='ChangeMonth(-1)' class='fa fa-chevron-left'></i><i onclick='ChangeMonth(1)' class='fa fa-chevron-right'></i></span>"
+	document.getElementById("sheet").innerHTML += "<span id='week'><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></span>"
+	
+	//Write Days
+	tempDate.setDate(tempDate.getDate()-tempDate.getDay())
+	for (i=0;i<(7*7);i++) {
+		document.getElementById("sheet").innerHTML += ("<span onclick='AddEvent(\""+tempDate.getFullYear()+"-"+('0'+(tempDate.getMonth()+1)).slice(-2)+"-"+('0'+tempDate.getDate()).slice(-2)+"\")' id='"+tempDate.getFullYear()+"-"+('0'+tempDate.getMonth()).slice(-2)+"-"+('0'+tempDate.getDate()).slice(-2)+"' class='"+(((tempDate.getMonth()==Month)&&(tempDate.getFullYear()==Year))?"":"off")+"' date='"+tempDate.getDate()+"'>"+tempDate.getDate()+"</span><span class='popup' id='popup"+tempDate.getFullYear()+"-"+('0'+tempDate.getMonth()).slice(-2)+"-"+('0'+tempDate.getDate()).slice(-2)+"'></span>")
+		tempDate.setDate(tempDate.getDate()+1)
+	}
+		
+	//Write Events
+	Colors = ["white","yellow","orange","red","purple","blue","green"]
+	tfirst = document.getElementById("sheet").getElementsByTagName("span")[9].getAttribute("id")
+	tlast  = document.getElementById("sheet").getElementsByTagName("span")[document.getElementById("sheet").getElementsByTagName("span").length-2].getAttribute("id")
+	var DateFirst = new Date(tfirst.split("-")[0],tfirst.split("-")[1],tfirst.split("-")[2])
+	var DateLast = new Date(tlast.split("-")[0],tlast.split("-")[1],tlast.split("-")[2])
+	var today = new Date()
+	today.setHours(0)
+	today.setMinutes(0)
+	today.setSeconds(0)
+	today.setMilliseconds(0)
+	
+	upcoming = []
+	
+	Events.forEach(function(element, index){
+		//check if they display on the current calendar sheet
+		var tempDate = new Date(element[1].split("-")[0],element[1].split("-")[1],element[1].split("-")[2])
+		if((tempDate.getTime()>=DateFirst.getTime())&&(tempDate.getTime()<=DateLast.getTime())){
+			if(document.getElementById(element[1]).innerHTML.indexOf("<i")<0) document.getElementById(element[1]).innerHTML = "<i class='fa "+Colors[element[0]]+" fa-"+CalCat[element[0]]+"'></i>"
+			if(document.getElementById(element[1]).getAttribute("class").indexOf("event")<0)document.getElementById(element[1]).setAttribute("class",document.getElementById(element[1]).getAttribute("class")+" event")
+			document.getElementById("popup"+element[1]).innerHTML += ("<span onclick='AddEvent(\""+Events.indexOf(element)+"\")' class='devent'><i class='fa "+Colors[element[0]]+" fa-"+CalCat[element[0]]+"'></i> "+element[2]+"<span class='minicalendar'>"+element[1].split("-")[2]+"/"+Months[Number(element[1].split("-")[1])].slice(0,3)+"</span><i class='fa fa-trash' onclick='DeleteEvent(\""+element[4]+"\")'></i><span class='comment'>"+element[3]+"</span></span>")
+			document.getElementById("popup"+element[1]).setAttribute("event","yes")
+		}
+		//Upcoming Events (next 30 days)
+		if((tempDate.getTime()>=today.getTime())&&(tempDate.getTime()<=(today.getTime()+31*24*60*60*1000))){
+			upcoming.push(element)
+		}
+	})
+	
+	//Write upcoming event
+	upcoming.sort(function(a,b){
+		var tempDateA = new Date(a[1].split("-")[0],a[1].split("-")[1],a[1].split("-")[2])
+		var tempDateB = new Date(b[1].split("-")[0],b[1].split("-")[1],b[1].split("-")[2])
+		return ((tempDateA<tempDateB)?-1:((tempDateA>tempDateB?1:0)))
+	})
+	upcoming.forEach(function(element){
+		document.getElementById("display").innerHTML += "<span onclick='AddEvent(\""+Events.indexOf(element)+"\")' class='devent'><i class='fa "+Colors[element[0]]+" fa-"+CalCat[element[0]]+"'></i> "+element[2]+"<span class='minicalendar'>"+element[1].split("-")[2]+"/"+Months[Number(element[1].split("-")[1])].slice(0,3)+"</span><i class='fa fa-trash' onclick='DeleteEvent(\""+element[4]+"\")'></i><span class='comment'>"+element[3]+"</span></span>"
+	})
+
+	//Write Today?
+	var tempDate= new Date()
+	var DateFirst = new Date(tfirst.split("-")[0],tfirst.split("-")[1],tfirst.split("-")[2])
+	var DateLast =  new Date(tlast.split("-")[0],tlast.split("-")[1],tlast.split("-")[2])
+	if((tempDate.getTime()>=DateFirst.getTime())&&(tempDate.getTime()<=DateLast.getTime())){
+		document.getElementById(tempDate.getFullYear()+"-"+('0'+tempDate.getMonth()).slice(-2)+"-"+('0'+tempDate.getDate()).slice(-2)).setAttribute("class",document.getElementById(tempDate.getFullYear()+"-"+('0'+tempDate.getMonth()).slice(-2)+"-"+('0'+tempDate.getDate()).slice(-2)).getAttribute("class")+" today")
+	}	
+}
+
+function ChangeMonth(c){
+	if (((c==1)||(c==-1))||(c==0)){
+		if(c==0){
+			localStorage.Month = ""
+		} else {
+			Month = Month + c
+			if(Month>11){
+				Month=0
+				Year++
+			}
+			if(Month<0){
+				Month=11
+				Year--
+			}
+			localStorage.Month = Year + " " +Month
+		}
+		var tempDate = new Date()
+		if ((tempDate.getFullYear()==Year)&&(tempDate.getMonth()==Month)) localStorage.Month = ""
+		RenderCalendar()
+	}
+}
+
+function AddEvent(input){
+	document.getElementById("display").innerHTML = ""
+	document.getElementById("display").innerHTML += "<form id='CalCat'></form>"
+	CalCat.forEach(function(element,index){
+		document.getElementById("CalCat").innerHTML += "<input type='radio' name='calicons'id='c"+index+"' value='"+element+"' "+((!index)?"checked":"")+"> <label id='l"+index+"' for='c"+index+"'><i class='fa "+Colors[index]+" fa-"+element+"'></i></label>"
+	})
+	document.getElementById("display").innerHTML += "<input type='text' placeholder='Event'>"
+	
+	var tempDate = new Date()
+	
+	document.getElementById("display").innerHTML += "<input type='date' value='"+tempDate.getFullYear()+"-"+("0"+(tempDate.getMonth()+1)).slice(-2)+"-"+("0"+tempDate.getDate()).slice(-2)+"'>"
+	document.getElementById("display").innerHTML += "<textarea rows='3' placeholder='Comments'></textarea>"
+	document.getElementById("display").innerHTML += '<span id="cancelbtn" onclick="RenderCalendar()">CANCEL</span>'
+	document.getElementById("display").innerHTML += '<span id="okbtn" onclick="NewEvent()">OK</span>'
+	
+	if ((typeof input == "string")&&(input.length == 10)) document.getElementById("display").getElementsByTagName("input")[8].value = input
+	if (!isNaN(input)){
+		input = Events[input]
+		document.getElementById("display").getElementsByTagName("textarea")[0].value = input[3]
+		document.getElementById("display").getElementsByTagName("input")[7].value = input[2]
+		document.getElementById("display").getElementsByTagName("input")[8].value = input[1].split("-")[0]+"-"+("0"+(Number(input[1].split("-")[1])+1)).slice(-2)+"-"+("0"+input[1].split("-")[2]).slice(-2)
+		document.getElementById("CalCat").getElementsByTagName("input")[input[0]].checked = true
+		document.getElementById("okbtn").setAttribute("onclick","NewEvent('"+input[4]+"')")
+	}
+}
+
+function NewEvent(id){
+	vCom = document.getElementById("display").getElementsByTagName("textarea")[0].value
+	vEve = document.getElementById("display").getElementsByTagName("input")[7].value
+	vDate = document.getElementById("display").getElementsByTagName("input")[8].value
+	vCor = document.querySelector('input[name="calicons"]:checked').getAttribute("id")
+
+	if(vEve&&vDate){
+		var tempDate = new Date(vDate.split("-")[0],Number(vDate.split("-")[1])-1,vDate.split("-")[2])
+		tempDate.setDate(tempDate.getDate()+1)
+		var resource = {
+		  "summary": vEve,
+		  "colorId": EventIcons(vCor),
+		  "description": ((vCom)?vCom:""),
+		  "start": {
+			"date": vDate
+		  },
+		  "end": {
+			"date": tempDate.getFullYear()+"-"+('0'+(tempDate.getMonth()+1)).slice(-2)+"-"+("0"+tempDate.getDate()).slice(-2)
+			}
+		  };
+		if (id) {
+			var request = gapi.client.calendar.events.update({
+			  'calendarId': 'primary',
+			  'resource': resource,
+			  'eventId': id
+			});
+		} else {
+			var request = gapi.client.calendar.events.insert({
+			  'calendarId': 'primary',
+			  'resource': resource
+			});
+		}
+		request.execute(function(resp) {
+		  console.log(resp);
+		});
+		checkAuth()
+	} else {
+		alert("Event name or date not valid.")
+	}
+
+}
+
+function DeleteEvent(id){
+	var request = gapi.client.calendar.events.delete({
+	  'calendarId': 'primary',
+	  'eventId': id
+	});
+	request.execute(function(resp) {
+	  console.log(resp);
+	});
+	checkAuth()
+}
+
+function CalendarSetting(){
+	document.getElementById("display").innerHTML = ""
+	document.getElementById("display").innerHTML += "<form id='CalCat'></form>"
+	CalCat.forEach(function(element,index){
+		document.getElementById("CalCat").innerHTML += "<input type='radio' name='calicons'id='c"+index+"' value='"+element+"' "+((!index)?"checked":"")+"> <label id='l"+index+"' for='c"+index+"'><i class='fa "+Colors[index]+" fa-"+element+"'></i></label>"
+	})
+	Icons = "star asterisk birthday-cake cloud-download coffee cog comments-o dollar eye futbol-o gamepad gift globe graduation-cap heart leaf music paint-brush paper-plane paw plane pencil power-off puzzle-piece quote-left rocket ambulance automobile bicycle bus fighter-jet motorcycle ship android apple calculator user camera camera-retro clock-o desktop facebook-square feed file floppy-o folder-o font headphones laptop mobile wifi briefcase credit-card-alt gavel line-chart money suitcase balance-scale beer binoculars bomb book calendar calendar-o chain check cutlery envelope-o exclamation-triangle female film fire flag-o flash flask fort-awesome glass group home lightbulb-o lock male map-marker random sticky-note ticket tree trophy"
+	Icons = Icons.split(" ")
+	Icons.forEach(function(element){
+		document.getElementById("display").innerHTML += "<i onclick='CalIcon(\""+element+"\")' class='fa fa-"+element+"'></i>"
+	})
+	document.getElementById("display").innerHTML += '<span id="cancelbtn" onclick="RenderCalendar()">CANCEL</span>'
+	document.getElementById("display").innerHTML += '<span id="okbtn" onclick="SaveCalIcons()">OK</span>'
+}
+
+function CalIcon(icon){
+	document.querySelector('input[name="calicons"]:checked').value = icon
+	document.getElementById("l"+document.querySelector('input[name="calicons"]:checked').getAttribute("id").slice(1)).innerHTML = "<i class='fa "+Colors[document.querySelector('input[name="calicons"]:checked').getAttribute("id").slice(1)]+" fa-"+icon+"'></i>"
+}
+
+function SaveCalIcons(){
+	for(i=0;i<7;i++){
+		CalCat[i] = document.getElementById("CalCat").getElementsByTagName("input")[i].value
+	}
+	localStorage.CalCat = CalCat.join("|")
+	RenderCalendar()
+}
+
+//Initiate Procedure
+function RenderTasks(){
+	//Clean Up
+	document.getElementById("todo").innerHTML = ""
+
+	//#############################
+	// SET UP CATEGORIES
+	//#############################
+
+	// TaskCategories:
+	//[0] = Name
+	//[1] = Color
+	//[2] = Icon
+
+	TaskCategory = []
+	temp = localStorage.TaskCategory
+	if (!temp) {
+		temp = ""
+	} else {
+		temp.split("||").forEach(function(element, index){
+			TaskCategory[index]=element.split("|")
+		})
+	}
+
+	//#############################
+	// CHECK MINIMIZED
+	//#############################
+	Minimized = []
+	temp = localStorage.Minimized
+	if (!temp) {
+		temp = ""
+	} else {
+		Minimized=temp.split("|")
+	}
+
+	
+	//#############################
+	// SET UP TASKS
+	//#############################
+	
+	// Tasks:
+	//[0] = Category
+	//[1] = Icon
+	//[2] = Task
+
+	Tasks = []
+	temp = localStorage.Tasks
+	if (!temp) {
+		temp = ""
+	} else {
+		temp.split("||").forEach(function(element, index){
+			Tasks[index]=element.split("|")
+		})
+	}
+
+	//#############################
+	// WRITE TASKS
+	//#############################
+	
+	Icons = ["square","square-o","check-square-o","star-o","exclamation-circle"]
+	Icolor = ["trans","white","blue","yellow","red"]
+	
+	//Set Up Category Boxes
+	TaskCategory.forEach(function(element,index){
+		document.getElementById("todo").innerHTML += ('<div draggable="true" ondragover="allowDrop(event)" ondrop="drop(event)" ondragstart="drag(event)" id="cat'+("000"+index).slice(-3)+'">\
+		<span minimized="'+Minimized[index]+'" class="category"><i onclick="ToggleMinimize('+index+')" class="fa fa-'+TaskCategory[index][2]+' '+TaskCategory[index][1]+'"></i><span onclick="SetNewCategory('+index+')">'+TaskCategory[index][0]+'</span><i class="fa fa-trash" onclick="DeleteCategory('+index+')"></i></span>\
+		</div>')
+	})
+
+	//Add New Category
+	document.getElementById("todo").innerHTML += ('<div id="catnew">\
+	<span class="category" onclick="SetNewCategory(\'new\')"><i class="fa fa-plus"></i> Add New Category</span>\
+	</div>')
+	
+	//Distribute Tasks to Categories	
+	Tasks.forEach(function(element,index){
+		if (element[0] < TaskCategory.length) document.getElementById("cat"+("000"+element[0]).slice(-3)).innerHTML += "<span class='task'><i oncontextmenu='return false;' onmousedown='ChangeTaskIcon(event,"+index+")' class='"+Icolor[Tasks[index][1]]+" fa fa-"+Icons[Tasks[index][1]]+"'></i><span onclick='ChangeTask("+index+")' id='t"+index+"'>"+element[2]+"</span><i class='fa fa-times'  onclick='DeleteTask("+index+")'></i><i class='fa fa-comment-o'  onclick='AddTaskUnder("+index+")'></i></span>"
+		else delete Tasks[index]
+	})
+	
+	//
+	
+	//Count # of Tasks per Category & Set Up Add New Task to Categories
+	TaskCategory.forEach(function(element,index){
+		document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("category")[0].setAttribute("tasks",document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("task").length)
+		document.getElementById("cat"+("00"+index).slice(-3)).innerHTML += "<span class='task addtask' onclick='AddTask("+index+")'><i class='fa fa-plus'></i>Add New Task</span>"
+	})
+	
+}
+
+function ChangeTaskIcon(event,index){
+	if (event.which==1) Tasks[index][1]++
+	if (event.which==3) {
+		Tasks[index][1] = Tasks[index][1] - 1 + Icons.length
+	}
+	Tasks[index][1]%=Icons.length
+	SaveTasks()
+}
+
+function SaveTasks(NewCat){
+	temp=[]
+	TaskCategory.forEach(function(element, index){
+		if(NewCat) {
+			if (index<document.getElementsByClassName("category").length-2) temp.push(document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("category")[0].getAttribute("Minimized"))
+		} else{
+			if (index<document.getElementsByClassName("category").length-1) temp.push(document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("category")[0].getAttribute("Minimized"))
+		}
+	})
+	localStorage.Minimized = temp.join("|")
+	
+	temp = []
+	Tasks.forEach(function(element){
+		temp.push(element.join("|"))
+	})
+	localStorage.Tasks = temp.join("||")
+
+	temp = []
+	TaskCategory.forEach(function(element){
+		temp.push(element.join("|"))
+	})
+	localStorage.TaskCategory = temp.join("||")
+	
+	RenderTasks()
+}
+
+function ChangeTask(index){
+	SaveTasks()
+	TempTask = document.getElementById("t"+index).innerHTML = "<input type='text' onkeydown='RedoTask(this,"+index+")'>"
+	document.getElementsByTagName("input")[0].value = Tasks[index][2]
+	document.getElementsByTagName("input")[0].focus()
+}
+
+function RedoTask(element,index){
+	if(event.keyCode == 13) {
+        if (element.value.trim()) Tasks[index][2] = [element.value.trim().replace(/\|/g,"I")]
+		SaveTasks()
+    }
+	if(event.keyCode == 27) {
+        SaveTasks();        
+    }	
+}
+
+function AddTask(category){
+	SaveTasks()
+	NewTask = document.getElementById("cat"+("00"+category).slice(-3)).getElementsByClassName("addtask")[0]
+	NewTask.setAttribute("class","task")
+	NewTask.innerHTML = "<i class='fa fa-square-o'></i><input type='text' onkeydown='WriteTask(this,"+category+")'>"
+	document.getElementsByTagName("input")[0].focus()
+}
+
+function WriteTask(element,category){
+	if(event.keyCode == 13) {
+        if (element.value.trim()) Tasks[Tasks.length] = [category,1,element.value.trim().replace(/\|/g,"I")]
+		SaveTasks()
+    }
+	if(event.keyCode == 27) {
+        SaveTasks();        
+    }	
+}
+
+function AddTaskUnder(index){
+	SaveTasks()
+	temptask = document.createElement("span")
+	temptask.setAttribute("class","task")
+	temptask.innerHTML = "<i class='fa fa-square trans'></i><span><input type='text' onkeydown='WriteTaskUnder(this,"+index+","+Tasks[index][0]+")'></span>"
+	document.getElementById("t"+index).parentNode.parentNode.insertBefore(temptask,document.getElementById("t"+index).parentNode.nextSibling)
+	document.getElementsByTagName("input")[0].focus()
+}
+
+function WriteTaskUnder(element,index,category){
+	if(event.keyCode == 13) {
+        if (element.value.trim()) {
+			for (i = Tasks.length; i > (index+1);i--){
+				Tasks[i] = Tasks[i-1]
+			}
+			Tasks[index+1] = [category,0,element.value.trim().replace(/\|/g,"I")]
+		}
+		SaveTasks()
+    }
+	if(event.keyCode == 27) {
+        SaveTasks();        
+    }	
+}
+
+function DeleteTask(index){
+	delete Tasks[index]
+	SaveTasks()
+}
+
+function SetNewCategory(Category){
+	if((!isNaN(Number(Category)))||(Category="new")){
+		SaveTasks()
+		document.getElementById("cat"+("00"+Category).slice(-3)).innerHTML=""
+		document.getElementById("cat"+("00"+Category).slice(-3)).appendChild(document.getElementsByClassName("clone")[0].cloneNode())
+		document.getElementsByClassName("clone")[0].innerHTML = document.getElementsByClassName("clone")[1].innerHTML
+		document.getElementsByClassName("clone")[0].setAttribute("style","display:inline")
+		
+		if(Category=="new"){
+			document.getElementById("formcolors").getElementsByTagName("input")[Math.floor(Math.random()*document.getElementById("formcolors").getElementsByTagName("input").length)].checked = true
+			document.getElementById("formicons").getElementsByTagName("input")[Math.floor(Math.random()*document.getElementById("formicons").getElementsByTagName("input").length)].checked = true
+			document.getElementById("newicon").setAttribute("class","fa fa-"+document.querySelector('input[name="icon"]:checked').value+" "+document.querySelector('input[name="color"]:checked').value)
+		} else {
+			document.getElementById("NewCategoryName").innerHTML = TaskCategory[Number(Category)][0];        
+			document.getElementById(TaskCategory[Number(Category)][1]).checked = true;
+			document.getElementById(TaskCategory[Number(Category)][2]).checked = true;
+			document.getElementById("newicon").setAttribute("class","fa fa-"+document.querySelector('input[name="icon"]:checked').value+" "+document.querySelector('input[name="color"]:checked').value)
+		}
+		document.getElementById("okbtn").setAttribute("onclick","AddCategory('"+Category+"')")
+	} else {
+		SaveTasks()
+	}
+}
+
+function AddCategory(Category){
+	if (document.getElementById("NewCategoryName").getElementsByTagName("input")[0]) CatName = document.getElementById("NewCategoryName").getElementsByTagName("input")[0].value.trim().replace(/\|/g,"I")
+	else CatName = document.getElementById("NewCategoryName").innerHTML.trim().replace(/\|/g,"I")
+
+	if (CatName && Category) {
+		if (Category=="new") {
+			TaskCategory[TaskCategory.length] = [CatName,document.querySelector('input[name="color"]:checked').value,document.querySelector('input[name="icon"]:checked').value]
+			SaveTasks(true)
+		} else {
+			TaskCategory[Number(Category)] = [CatName,document.querySelector('input[name="color"]:checked').value,document.querySelector('input[name="icon"]:checked').value]
+			SaveTasks()
+		}
+	} else{
+		SaveTasks()
+	}
+}
+
+function ChangeCategoryName(){
+	document.getElementById("NewCategoryName").innerHTML = "<input type='text' onkeydown='WriteCategory(this,\""+document.getElementById("NewCategoryName").innerHTML+"\")'>"
+	document.getElementById("NewCategoryName").getElementsByTagName("input")[0].focus()
+}
+
+function WriteCategory(element,former){
+	if(event.keyCode == 13) {
+        if (element.value.trim()) {
+			document.getElementById("NewCategoryName").innerHTML = element.value.trim().replace(/\|/g,"I");        
+		}else{
+			document.getElementById("NewCategoryName").innerHTML = former;        
+		}
+    }
+	if(event.keyCode == 27) {
+        document.getElementById("NewCategoryName").innerHTML = former;        
+    }	
+}
+
+function DeleteCategory(index){
+	delete TaskCategory[index]
+	Tasks.forEach(function(element,i){
+		if (element[0] == index) delete Tasks[i]
+		if (element[0] > index) element[0]--
+	})
+	SaveTasks()
+}
+
+function SwapCategories(a,b){
+	if(Math.max(a,b)<TaskCategory.length){
+		temp = TaskCategory[a]
+		TaskCategory[a] = TaskCategory[b]
+		TaskCategory[b] = temp
+		Tasks.forEach(function(element){
+			if (element[0]==a || element[0]==b){
+				if (element[0]==a) element[0] = b
+				else element[0] = a
+			}
+		})
+		SaveTasks()
+	}
+}
+
+function ToggleMinimize(index){
+	if  (document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("category")[0].getAttribute("Minimized")) document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("category")[0].setAttribute("Minimized","")
+	else document.getElementById("cat"+("00"+index).slice(-3)).getElementsByClassName("category")[0].setAttribute("Minimized","yes")
+	SaveTasks()
+}
+
+function refreshicon(type,data){
+	if (type=="color") {
+		icon = document.querySelector('input[name="icon"]:checked').value
+		color = data
+	} else {
+		icon  = data
+		color = document.querySelector('input[name="color"]:checked').value
+	}	
+	document.getElementById("newicon").setAttribute("class","fa fa-"+icon+" "+color)
+}
+
+RenderTasks()
+</script>
+<script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
+
+	<span class="clone" style="display:none;">
+	<div>
+		<span class="category">
+			<i id="newicon" ></i>
+			<span id="NewCategoryName" onclick="ChangeCategoryName()">New Category</span>
+		</span>
+		<span id="NewCategory">
+			<form id="formcolors">
+				<input type="radio" name="color" id="yellow" value="yellow">	<label for="yellow" onclick="refreshicon('color','yellow')"> </label>
+				<input type="radio" name="color" id="orange" value="orange">	<label for="orange" onclick="refreshicon('color','orange')"> </label>
+				<input type="radio" name="color" id="red" 	 value="red"> 		<label for="red" 	onclick="refreshicon('color','red')"> </label>
+				<input type="radio" name="color" id="purple" value="purple"> 	<label for="purple" onclick="refreshicon('color','purple')"></label>
+				<input type="radio" name="color" id="blue" 	 value="blue"> 		<label for="blue" 	onclick="refreshicon('color','blue')"> </label>
+				<input type="radio" name="color" id="green"	 value="green"> 	<label for="green" 	onclick="refreshicon('color','green')"> </label>
+			</form>
+			<form id="formicons">
+				<script >
+					Icons = "star asterisk birthday-cake cloud-download coffee cog comments-o dollar eye futbol-o gamepad gift globe graduation-cap heart leaf music paint-brush paper-plane paw plane pencil power-off puzzle-piece quote-left rocket ambulance automobile bicycle bus fighter-jet motorcycle ship android apple calculator user camera camera-retro clock-o desktop facebook-square feed file floppy-o folder-o font headphones laptop mobile wifi briefcase credit-card-alt gavel line-chart money suitcase balance-scale beer binoculars bomb book calendar calendar-o chain check cutlery envelope-o exclamation-triangle female film fire flag-o flash flask fort-awesome glass group home lightbulb-o lock male map-marker random sticky-note ticket tree trophy"
+					Icons = Icons.split(" ")
+					Icons.forEach(function(element){
+						document.write("<input type='radio' name='icon' id='"+element+"' value='"+element+"'> <label for='"+element+"' onclick=\'refreshicon(\"icon\",\""+element+"\")\'><i class='fa fa-"+element+"'></i></label>")
+					})
+				</script>
+			</form>
+			<span id="cancelbtn" onclick="SaveTasks()">CANCEL</span>
+			<span id="okbtn" onclick="AddCategory()">OK</span>
+		</span>		
+	</div>
+	</span>
+
+
+</body>
+</html>
